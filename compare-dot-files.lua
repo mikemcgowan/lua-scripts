@@ -14,6 +14,6 @@ for _, dotfile in ipairs(lib.files_in_path(dotfiles_dir)) do
   if lfs.attributes(root) ~= nil then
     os.execute("git diff ~/." .. dotfile .. " " .. dotfiles_dir .. "/" .. dotfile)
   else
-    print(lib.colour_text("Dotfile '" .. root .. "' is missing!", "yellow"))
+    print(lib.colour_text("Dotfile '" .. root .. "' is missing!", lib.colours.yellow))
   end
 end

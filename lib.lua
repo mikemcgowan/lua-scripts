@@ -11,7 +11,7 @@ local colours = {
 local function colour_text(text, colour)
   local s = colours.bold
   if colour then
-    s = s .. colours[colour]
+    s = s .. colour
   end
   s = s .. text .. colours.reset
   return s
@@ -28,7 +28,7 @@ end
 local function load_lines_from_file(filename)
   local file = io.open(filename, "r")
   if not file then
-    print(colour_text("Could not open file '" .. filename .. "'", "yellow"))
+    print(colour_text("Could not open file '" .. filename .. "'", colours.yellow))
     os.exit(1)
   end
   local lines = {}
@@ -51,6 +51,7 @@ local function files_in_path(path)
 end
 
 return {
+  colours = colours,
   colour_text = colour_text,
   capture_output = capture_output,
   load_lines_from_file = load_lines_from_file,
