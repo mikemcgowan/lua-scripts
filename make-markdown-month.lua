@@ -26,12 +26,14 @@ local function day_of_week_text(day_of_week)
 end
 
 if not arg[1] then
-  print(lib.colour_text("Missing 1st arg: year", "yellow"))
-  os.exit(1)
+  print(lib.colour_text("Missing arg 1/2: year", "yellow"))
 end
 
 if not arg[2] then
-  print(lib.colour_text("Missing 2nd arg: month", "yellow"))
+  print(lib.colour_text("Missing arg 2/2: month", "yellow"))
+end
+
+if not arg[1] or not arg[2] then
   os.exit(1)
 end
 

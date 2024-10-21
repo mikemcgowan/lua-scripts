@@ -25,6 +25,20 @@ local function capture_output(cmd, mode)
   return output
 end
 
+local function load_lines_from_file(filename)
+  local file = io.open(filename, "r")
+  if not file then
+    print(colour_text("Could not open file '" .. filename .. "'", "yellow"))
+    os.exit(1)
+  end
+  local lines = {}
+  for line in file:lines() do
+    table.insert(lines, line)
+  end
+  file:close()
+  return lines
+end
+
 local function files_in_path(path)
   local files = {}
   for file in lfs.dir(path) do
@@ -39,5 +53,6 @@ end
 return {
   colour_text = colour_text,
   capture_output = capture_output,
+  load_lines_from_file = load_lines_from_file,
   files_in_path = files_in_path,
 }
