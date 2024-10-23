@@ -26,28 +26,24 @@ local function day_of_week_text(day_of_week)
 end
 
 if not arg[1] then
-  print(lib.colour_text("Missing arg 1/2: year", lib.colours.yellow))
+  print(("Missing arg 1/2: year"):add_colour(lib.colours.yellow))
 end
 
 if not arg[2] then
-  print(lib.colour_text("Missing arg 2/2: month", lib.colours.yellow))
+  print(("Missing arg 2/2: month"):add_colour(lib.colours.yellow))
 end
 
 if not arg[1] or not arg[2] then
   os.exit(1)
 end
 
-print(lib.colour_text("| Day | Alcohol | Coffee |"))
-print(lib.colour_text("| --- | ------- | ------ |"))
+print("| Day | Alcohol | Coffee |")
+print("| --- | ------- | ------ |")
 
 local info = month_info(arg[1], arg[2])
 local day_of_week = info.first_day_of_week
 for day_in_month = 1, info.days_in_month do
-  print(
-    lib.colour_text(
-      "|  " .. string.format("%2d", day_in_month) .. " | " .. day_of_week_text(day_of_week) .. "     |        |"
-    )
-  )
+  print("|  " .. string.format("%2d", day_in_month) .. " | " .. day_of_week_text(day_of_week) .. "     |        |")
   day_of_week = day_of_week + 1
   if day_of_week > 7 then
     day_of_week = 1

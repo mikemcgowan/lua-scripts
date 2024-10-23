@@ -1,30 +1,27 @@
 local lib = require("lib")
 
-describe("colour_text", function()
+describe("string.add_colour", function()
   it("applies bold by default (to make the text brighter)", function()
     local s = "hello"
-    assert.are.same(lib.colours.bold .. s .. lib.colours.reset, lib.colour_text(s))
+    assert.are.same(lib.colours.bold .. s .. lib.colours.reset, s:add_colour())
   end)
 
   it("applies the given colour", function()
     local s = "hello"
-    assert.are.same(
-      lib.colours.bold .. lib.colours.cyan .. s .. lib.colours.reset,
-      lib.colour_text(s, lib.colours.cyan)
-    )
+    assert.are.same(lib.colours.bold .. lib.colours.cyan .. s .. lib.colours.reset, s:add_colour(lib.colours.cyan))
   end)
 end)
 
-describe("visible_length", function()
+describe("string.visible_length", function()
   it("returns the original string length if there are no colours", function()
     local s = "hello"
-    assert.are.same(#s, lib.visible_length(s))
+    assert.are.same(#s, s:visible_length())
   end)
 
   it("returns the visible string length if there are some colours", function()
     local s = "hello"
-    local coloured_s = lib.colour_text(s, lib.colours.cyan)
-    assert.are.same(#s, lib.visible_length(coloured_s))
+    local coloured_s = s:add_colour(lib.colours.cyan)
+    assert.are.same(#s, coloured_s:visible_length())
   end)
 end)
 
@@ -38,5 +35,28 @@ describe("capture_output", function()
     local result = lib.capture_output("pwd")
     local lua_scripts = "lua-scripts"
     assert.are.same(lua_scripts, result:sub(-#lua_scripts))
+  end)
+end)
+
+describe("load_lines_from_file", function()
+  it("loads lines from a plain text file", function()
+    local expected_line_count = 5
+    local result = lib.load_lines_from_file("spec/load_lines_from_file.txt")
+    assert.are.same(expected_line_count, #result)
+    for i = 1, expected_line_count do
+      assert.are.same("line " .. i, result[i])
+    end
+  end)
+end)
+
+describe("files_in_path", function()
+  it("gets files in given path", function()
+    local expected_file_count = 3
+    local result = lib.files_in_path("spec/files_in_path/")
+    assert.are.same(expected_file_count, #result)
+    table.sort(result)
+    for i = 1, expected_file_count do
+      assert.are.same("file" .. i .. ".txt", result[i])
+    end
   end)
 end)

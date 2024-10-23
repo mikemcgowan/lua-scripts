@@ -3,7 +3,7 @@ local lib = require("lib")
 
 local track = arg[1]
 if not track then
-  print(lib.colour_text("Missing arg 1/1: exercism track", lib.colours.yellow))
+  print(("Missing arg 1/1: exercism track"):add_colour(lib.colours.yellow))
   os.exit(1)
 end
 
@@ -27,15 +27,15 @@ for _, exercise in ipairs(lines) do
     end
     lfs.chdir("..")
   else
-    print(lib.colour_text("Skipping '" .. exercise .. "' as it doesn't appear to be downloaded", lib.colours.yellow))
+    print(("Skipping '" .. exercise .. "' as it doesn't appear to be downloaded"):add_colour(lib.colours.yellow))
   end
 end
 
-print(lib.colour_text(successful .. " out of " .. #lines .. " succeeded", lib.colours.green))
+print((successful .. " out of " .. #lines .. " succeeded"):add_colour(lib.colours.green))
 if #failures > 0 then
   local s = #failures == 1 and "exercise" or "exercises"
-  print(lib.colour_text("The following " .. #failures .. " " .. s .. " failed:", lib.colours.yellow))
+  print(("The following " .. #failures .. " " .. s .. " failed:"):add_colour(lib.colours.yellow))
   for _, v in ipairs(failures) do
-    print(lib.colour_text(v))
+    print(v:add_colour())
   end
 end

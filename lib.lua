@@ -8,7 +8,7 @@ local colours = {
   cyan = "\27[36m",
 }
 
-local function colour_text(text, colour)
+function string.add_colour(text, colour)
   local s = colours.bold
   if colour then
     s = s .. colour
@@ -17,7 +17,7 @@ local function colour_text(text, colour)
   return s
 end
 
-local function visible_length(text)
+function string.visible_length(text)
   local ansi_pattern = "\27%[%d+m"
   local stripped = text:gsub(ansi_pattern, "")
   return #stripped
@@ -34,7 +34,7 @@ end
 local function load_lines_from_file(filename)
   local file = io.open(filename, "r")
   if not file then
-    print(colour_text("Could not open file '" .. filename .. "'", colours.yellow))
+    print(("Could not open file '" .. filename .. "'"):add_colour(colours.yellow))
     os.exit(1)
   end
   local lines = {}
@@ -58,8 +58,6 @@ end
 
 return {
   colours = colours,
-  colour_text = colour_text,
-  visible_length = visible_length,
   capture_output = capture_output,
   load_lines_from_file = load_lines_from_file,
   files_in_path = files_in_path,
