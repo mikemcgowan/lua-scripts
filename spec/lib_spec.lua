@@ -8,7 +8,10 @@ describe("string.add_colour", function()
   end)
 
   it("applies the given colour", function()
-    assert.are.same(lib.colours.bold .. lib.colours.cyan .. hello .. lib.colours.reset, hello:add_colour(lib.colours.cyan))
+    assert.are.same(
+      lib.colours.bold .. lib.colours.cyan .. hello .. lib.colours.reset,
+      hello:add_colour(lib.colours.cyan)
+    )
   end)
 end)
 
@@ -20,6 +23,22 @@ describe("string.visible_length", function()
   it("returns the visible string length if there are some colours", function()
     local coloured_s = hello:add_colour(lib.colours.cyan)
     assert.are.same(#hello, coloured_s:visible_length())
+  end)
+end)
+
+describe("string.split", function()
+  it("can split a string on tabs", function()
+    local s = "foo\tbar\t\twibble\twoo"
+    local result = s:split("[^\t]+")
+    assert.are.same({ "foo", "bar", "wibble", "woo" }, result)
+  end)
+end)
+
+describe("string.to_lines", function()
+  it("can split a string on new lines", function()
+    local s = "line 1\r\nline 2\nline 3\r\nline 4\nline 5"
+    local result = s:to_lines()
+    assert.are.same({ "line 1", "line 2", "line 3", "line 4", "line 5" }, result)
   end)
 end)
 
@@ -55,5 +74,27 @@ describe("files_in_path", function()
     for i = 1, expected_file_count do
       assert.are.same("file" .. i .. ".txt", result[i])
     end
+  end)
+end)
+
+describe("map", function()
+  it("applies the given function to every item in the collection", function()
+    assert.are.same(
+      { 1, 4, 9, 16, 25, 36 },
+      lib.map({ 1, 2, 3, 4, 5, 6 }, function(n)
+        return n * n
+      end)
+    )
+  end)
+end)
+
+describe("filter", function()
+  it("applies the given predicate to every item in the collection", function()
+    assert.are.same(
+      { 4, 16, 36 },
+      lib.filter({ 1, 4, 9, 16, 25, 36 }, function(n)
+        return n % 2 == 0
+      end)
+    )
   end)
 end)

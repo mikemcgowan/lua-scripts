@@ -23,6 +23,18 @@ function string.visible_length(text)
   return #stripped
 end
 
+function string.split(text, expr)
+  local lines = {}
+  for line in text:gmatch(expr) do
+    table.insert(lines, line)
+  end
+  return lines
+end
+
+function string.to_lines(text)
+  return text:split("[^\r\n]+")
+end
+
 local function capture_output(cmd, mode)
   mode = mode or "*line"
   local f = assert(io.popen(cmd, "r"))
@@ -56,9 +68,29 @@ local function files_in_path(path)
   return files
 end
 
+local function map(t, f)
+  local u = {}
+  for _, v in ipairs(t) do
+    table.insert(u, f(v))
+  end
+  return u
+end
+
+local function filter(t, p)
+  local u = {}
+  for _, v in ipairs(t) do
+    if p(v) then
+      table.insert(u, v)
+    end
+  end
+  return u
+end
+
 return {
   colours = colours,
   capture_output = capture_output,
   load_lines_from_file = load_lines_from_file,
   files_in_path = files_in_path,
+  map = map,
+  filter = filter,
 }
