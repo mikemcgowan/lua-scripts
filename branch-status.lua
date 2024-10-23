@@ -65,7 +65,7 @@ print(
     .. " Branch "
     .. (" "):rep(col_name_length - #" Branch " + 2)
     .. box.verti
-    .. (" vs " .. base .. " "):pad_right(#" Behind | Ahead "):add_colour()
+    .. (" vs " .. base:sub(1, #"Behind | Ahead" - 3) .. " "):pad_right(#" Behind | Ahead "):add_colour()
     .. box.verti
     .. (" vs origin "):pad_right(#" Behind | Ahead ")
     .. box.verti
