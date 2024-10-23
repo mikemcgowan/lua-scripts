@@ -86,6 +86,18 @@ local function filter(t, p)
   return u
 end
 
+local function max_by(t, f)
+  local max = nil
+  local max_value = nil
+  for _, v in ipairs(t) do
+    if not max_value or f(v) > max_value then
+      max_value = f(v)
+      max = v
+    end
+  end
+  return max
+end
+
 return {
   colours = colours,
   capture_output = capture_output,
@@ -93,4 +105,5 @@ return {
   files_in_path = files_in_path,
   map = map,
   filter = filter,
+  max_by = max_by,
 }

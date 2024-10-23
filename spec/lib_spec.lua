@@ -98,3 +98,35 @@ describe("filter", function()
     )
   end)
 end)
+
+describe("max_by", function()
+  it("finds the largest int", function()
+    local result = lib.max_by({ 5, 7, 2, 7, 9, 4 }, function(x)
+      return x
+    end)
+    assert.are.same(9, result)
+  end)
+
+  it("finds the longest string", function()
+    local result = lib.max_by({
+      "short",
+      "not long",
+      "the very longest of all of them",
+      "quite long, but not very long",
+      "medium length",
+      "shrt",
+    }, function(x)
+      return #x
+    end)
+    assert.are.same("the very longest of all of them", result)
+  end)
+
+  it("returns nil if there's no max", function()
+    assert.are.same(
+      nil,
+      lib.max_by({}, function(x)
+        return x
+      end)
+    )
+  end)
+end)
