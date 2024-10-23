@@ -17,6 +17,12 @@ local function colour_text(text, colour)
   return s
 end
 
+local function visible_length(text)
+  local ansi_pattern = "\27%[%d+m"
+  local stripped = text:gsub(ansi_pattern, "")
+  return #stripped
+end
+
 local function capture_output(cmd, mode)
   mode = mode or "*line"
   local f = assert(io.popen(cmd, "r"))
@@ -53,6 +59,7 @@ end
 return {
   colours = colours,
   colour_text = colour_text,
+  visible_length = visible_length,
   capture_output = capture_output,
   load_lines_from_file = load_lines_from_file,
   files_in_path = files_in_path,
