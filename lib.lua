@@ -8,6 +8,20 @@ local colours = {
   cyan = "\27[36m",
 }
 
+local table_chars = {
+  horiz = "─",
+  verti = "│",
+  top_l = "┌",
+  bot_r = "┘",
+  top_r = "┐",
+  bot_l = "└",
+  top_t = "┬",
+  bot_t = "┴",
+  jun_l = "├",
+  jun_r = "┤",
+  cross = "┼",
+}
+
 function string.add_colour(text, colour)
   local s = colours.bold
   if colour then
@@ -33,6 +47,22 @@ end
 
 function string.to_lines(text)
   return text:split("[^\r\n]+")
+end
+
+function string.pad_left(text, size)
+  if text:visible_length() >= size then
+    return text
+  else
+    return (" "):rep(size - text:visible_length()) .. text
+  end
+end
+
+function string.pad_right(text, size)
+  if text:visible_length() >= size then
+    return text
+  else
+    return text .. (" "):rep(size - text:visible_length())
+  end
 end
 
 local function capture_output(cmd, mode)
@@ -100,6 +130,7 @@ end
 
 return {
   colours = colours,
+  table_chars = table_chars,
   capture_output = capture_output,
   load_lines_from_file = load_lines_from_file,
   files_in_path = files_in_path,

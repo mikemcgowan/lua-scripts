@@ -42,6 +42,26 @@ describe("string.to_lines", function()
   end)
 end)
 
+describe("string.pad_left", function()
+  it("pads with spaces if the string is shorter than the requested size", function()
+    assert.are.same((" "):rep(5) .. hello, hello:pad_left(10))
+  end)
+
+  it("returns the original string if the requested length is less than the length of the original string", function()
+    assert.are.same(hello, hello:pad_left(4))
+  end)
+end)
+
+describe("string.pad_right", function()
+  it("pads with spaces if the string is shorter than the requested size", function()
+    assert.are.same(hello .. (" "):rep(5), hello:pad_right(10))
+  end)
+
+  it("returns the original string if the requested length is less than the length of the original string", function()
+    assert.are.same(hello, hello:pad_right(4))
+  end)
+end)
+
 describe("capture_output", function()
   it("captures the output of an echo", function()
     assert.are.same(hello, lib.capture_output("echo " .. hello))

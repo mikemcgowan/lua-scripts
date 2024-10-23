@@ -24,8 +24,8 @@ local function behind_and_ahead(from, to)
   local tabs = "[^\t]+"
   local rev_list = lib.capture_output("git rev-list --left-right --count " .. from .. "..." .. to)
   local rev_list_split = rev_list:split(tabs)
-  local behind = rev_list_split[1]
-  local ahead = rev_list_split[2]
+  local behind = tonumber(rev_list_split[1])
+  local ahead = tonumber(rev_list_split[2])
   return behind, ahead
 end
 
@@ -49,17 +49,118 @@ if branch_with_longest_name then
   col_name_length = #branch_with_longest_name.name
 end
 
-for _, branch in ipairs(branches) do
-  print(branch.name .. " is behind " .. branch.behind .. " and ahead " .. branch.ahead .. " of " .. base)
-  if branch.ahead_remote and branch.behind_remote then
-    print(
-      branch.name
-        .. " is behind "
-        .. branch.behind_remote
-        .. " and ahead "
-        .. branch.ahead_remote
-        .. " of origin/"
-        .. branch.name
-    )
+-- table header
+local box = lib.table_chars
+print(
+  box.top_l
+    .. box.horiz:rep(col_name_length + 2)
+    .. box.top_t
+    .. box.horiz:rep(#" Behind | Ahead ")
+    .. box.top_t
+    .. box.horiz:rep(#" Behind | Ahead ")
+    .. box.top_r
+)
+print(
+  box.verti
+    .. " Branch "
+    .. (" "):rep(col_name_length - #" Branch " + 2)
+    .. box.verti
+    .. (" vs " .. base .. " "):pad_right(#" Behind | Ahead "):add_colour()
+    .. box.verti
+    .. (" vs origin "):pad_right(#" Behind | Ahead ")
+    .. box.verti
+)
+print(
+  box.verti
+    .. (" "):rep(col_name_length + 2)
+    .. box.jun_l
+    .. box.horiz:rep(#" Behind ")
+    .. box.top_t
+    .. box.horiz:rep(#" Ahead ")
+    .. box.cross
+    .. box.horiz:rep(#" Behind ")
+    .. box.top_t
+    .. box.horiz:rep(#" Ahead ")
+    .. box.jun_r
+)
+print(
+  box.verti
+    .. (" "):rep(col_name_length + 2)
+    .. box.verti
+    .. " Behind "
+    .. box.verti
+    .. " Ahead "
+    .. box.verti
+    .. " Behind "
+    .. box.verti
+    .. " Ahead "
+    .. box.verti
+)
+print(
+  box.jun_l
+    .. box.horiz:rep(col_name_length + 2)
+    .. box.cross
+    .. box.horiz:rep(#" Behind ")
+    .. box.cross
+    .. box.horiz:rep(#" Ahead ")
+    .. box.cross
+    .. box.horiz:rep(#" Behind ")
+    .. box.cross
+    .. box.horiz:rep(#" Ahead ")
+    .. box.jun_r
+)
+
+local function behind_colour(n)
+  if not n then
+    return lib.colours.bold
+  else
+    return n == 0 and lib.colours.cyan or lib.colours.yellow
   end
 end
+
+local function ahead_colour(n)
+  if not n then
+    return lib.colours.bold
+  else
+    return n == 0 and lib.colours.cyan or lib.colours.green
+  end
+end
+
+-- loop over branches
+for _, branch in ipairs(branches) do
+  local behind_remote = branch.behind_remote and tostring(branch.behind_remote) or "n/a"
+  local ahead_remote = branch.ahead_remote and tostring(branch.ahead_remote) or "n/a"
+  print(
+    box.verti
+      .. " "
+      .. branch.name:pad_right(col_name_length + 1):add_colour()
+      .. box.verti
+      .. tostring(branch.behind):pad_left(#" Behind"):add_colour(behind_colour(branch.behind))
+      .. " "
+      .. box.verti
+      .. tostring(branch.ahead):pad_left(#" Ahead"):add_colour(ahead_colour(branch.ahead))
+      .. " "
+      .. box.verti
+      .. behind_remote:pad_left(#" Behind"):add_colour(behind_colour(branch.behind_remote))
+      .. " "
+      .. box.verti
+      .. ahead_remote:pad_left(#" Ahead"):add_colour(ahead_colour(branch.ahead_remote))
+      .. " "
+      .. box.verti
+  )
+end
+
+-- table footer
+print(
+  box.bot_l
+    .. box.horiz:rep(col_name_length + 2)
+    .. box.bot_t
+    .. box.horiz:rep(#" Behind ")
+    .. box.bot_t
+    .. box.horiz:rep(#" Ahead ")
+    .. box.bot_t
+    .. box.horiz:rep(#" Behind ")
+    .. box.bot_t
+    .. box.horiz:rep(#" Ahead ")
+    .. box.bot_r
+)
