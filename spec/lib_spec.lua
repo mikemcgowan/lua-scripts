@@ -1,4 +1,4 @@
-local lib = require("lib")
+local lib = require("../lib")
 
 describe("string.add_colour", function()
   it("applies bold by default (to make the text brighter)", function()
@@ -41,7 +41,7 @@ end)
 describe("load_lines_from_file", function()
   it("loads lines from a plain text file", function()
     local expected_line_count = 5
-    local result = lib.load_lines_from_file("spec/load_lines_from_file.txt")
+    local result = lib.load_lines_from_file("spec/fixtures/load_lines_from_file.txt")
     assert.are.same(expected_line_count, #result)
     for i = 1, expected_line_count do
       assert.are.same("line " .. i, result[i])
@@ -52,7 +52,7 @@ end)
 describe("files_in_path", function()
   it("gets files in given path", function()
     local expected_file_count = 3
-    local result = lib.files_in_path("spec/files_in_path/")
+    local result = lib.files_in_path("spec/fixtures/files_in_path/")
     assert.are.same(expected_file_count, #result)
     table.sort(result)
     for i = 1, expected_file_count do
