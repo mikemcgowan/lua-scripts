@@ -1,34 +1,31 @@
-local lib = require("../lib")
+local lib = require("lib")
+
+local hello = "hello"
 
 describe("string.add_colour", function()
   it("applies bold by default (to make the text brighter)", function()
-    local s = "hello"
-    assert.are.same(lib.colours.bold .. s .. lib.colours.reset, s:add_colour())
+    assert.are.same(lib.colours.bold .. hello .. lib.colours.reset, hello:add_colour())
   end)
 
   it("applies the given colour", function()
-    local s = "hello"
-    assert.are.same(lib.colours.bold .. lib.colours.cyan .. s .. lib.colours.reset, s:add_colour(lib.colours.cyan))
+    assert.are.same(lib.colours.bold .. lib.colours.cyan .. hello .. lib.colours.reset, hello:add_colour(lib.colours.cyan))
   end)
 end)
 
 describe("string.visible_length", function()
   it("returns the original string length if there are no colours", function()
-    local s = "hello"
-    assert.are.same(#s, s:visible_length())
+    assert.are.same(#hello, hello:visible_length())
   end)
 
   it("returns the visible string length if there are some colours", function()
-    local s = "hello"
-    local coloured_s = s:add_colour(lib.colours.cyan)
-    assert.are.same(#s, coloured_s:visible_length())
+    local coloured_s = hello:add_colour(lib.colours.cyan)
+    assert.are.same(#hello, coloured_s:visible_length())
   end)
 end)
 
 describe("capture_output", function()
   it("captures the output of an echo", function()
-    local s = "hello"
-    assert.are.same(s, lib.capture_output("echo " .. s))
+    assert.are.same(hello, lib.capture_output("echo " .. hello))
   end)
 
   it("captures the output of 'pwd'", function()
