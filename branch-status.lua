@@ -14,6 +14,13 @@ if not base then
   base = "master"
 end
 
+local base_exists = lib.capture_output("git branch -a --format='%(refname:short)' | grep -P '^" .. base .. "$'")
+if not base_exists or #base_exists == 0 or base_exists ~= base then
+  print(("Can't find base branch '" .. base .. "'"):add_colour(lib.colours.yellow))
+  os.exit(1)
+end
+print(("Branch status relative to base branch '" .. base .. "'"):add_colour(lib.colours.cyan))
+
 local refs_heads = "refs/heads/"
 local for_each_ref = lib.capture_output("git for-each-ref --format='%(refname)' " .. refs_heads, "*all")
 local branch_names = lib.map(for_each_ref:to_lines(), function(ref)
@@ -32,7 +39,8 @@ end
 local branches = lib.map(branch_names, function(branch_name)
   local behind, ahead = behind_and_ahead(base, branch_name)
   local t = { name = branch_name, behind = behind, ahead = ahead }
-  local remote_branch = lib.capture_output("git branch -r | grep -Po 'origin/" .. branch_name .. "' | uniq")
+  local remote_branch =
+    lib.capture_output("git branch -r --format='%(refname:short)' | grep -Po 'origin/" .. branch_name .. "' | uniq")
   if remote_branch and #remote_branch > 0 then
     behind, ahead = behind_and_ahead(branch_name, "origin/" .. branch_name)
     t.behind_remote = behind
@@ -41,126 +49,110 @@ local branches = lib.map(branch_names, function(branch_name)
   return t
 end)
 
+local col_widths = {
+  first = #" Branch ",
+  behind = #" Behind ",
+  ahead = #" Ahead ",
+  behind_ahead = #" Behind | Ahead ",
+}
+
 local branch_with_longest_name = lib.max_by(branches, function(branch)
   return #branch.name
 end)
-local col_name_length = 1
-if branch_with_longest_name then
-  col_name_length = #branch_with_longest_name.name
+
+if branch_with_longest_name and #branch_with_longest_name.name > col_widths.first then
+  col_widths.first = #branch_with_longest_name.name
 end
 
--- table header
 local box = lib.table_chars
-print(
-  box.top_l
-    .. box.horiz:rep(col_name_length + 2)
+
+local function top_border_row()
+  return box.top_l
+    .. box.horiz:rep(col_widths.first + 2)
     .. box.top_t
-    .. box.horiz:rep(#" Behind | Ahead ")
+    .. box.horiz:rep(col_widths.behind_ahead)
     .. box.top_t
-    .. box.horiz:rep(#" Behind | Ahead ")
+    .. box.horiz:rep(col_widths.behind_ahead)
     .. box.top_r
-)
-print(
-  box.verti
+end
+
+local function header_row()
+  return box.verti
     .. " Branch "
-    .. (" "):rep(col_name_length - #" Branch " + 2)
+    .. (" "):rep(col_widths.first - #" Branch " + 2)
     .. box.verti
-    .. (" vs " .. base:sub(1, #"Behind | Ahead" - 3) .. " "):pad_right(#" Behind | Ahead "):add_colour()
+    .. (" vs " .. base:sub(1, col_widths.behind_ahead - 5) .. " "):pad_right(col_widths.behind_ahead):add_colour()
     .. box.verti
-    .. (" vs origin "):pad_right(#" Behind | Ahead ")
+    .. (" vs origin "):pad_right(col_widths.behind_ahead)
     .. box.verti
-)
-print(
-  box.verti
-    .. (" "):rep(col_name_length + 2)
-    .. box.jun_l
-    .. box.horiz:rep(#" Behind ")
-    .. box.top_t
-    .. box.horiz:rep(#" Ahead ")
-    .. box.cross
-    .. box.horiz:rep(#" Behind ")
-    .. box.top_t
-    .. box.horiz:rep(#" Ahead ")
-    .. box.jun_r
-)
-print(
-  box.verti
-    .. (" "):rep(col_name_length + 2)
-    .. box.verti
-    .. " Behind "
-    .. box.verti
-    .. " Ahead "
-    .. box.verti
-    .. " Behind "
-    .. box.verti
-    .. " Ahead "
-    .. box.verti
-)
-print(
-  box.jun_l
-    .. box.horiz:rep(col_name_length + 2)
-    .. box.cross
-    .. box.horiz:rep(#" Behind ")
-    .. box.cross
-    .. box.horiz:rep(#" Ahead ")
-    .. box.cross
-    .. box.horiz:rep(#" Behind ")
-    .. box.cross
-    .. box.horiz:rep(#" Ahead ")
-    .. box.jun_r
-)
+end
+
+local function horiz_div_row(bits, horiz1, horiz2)
+  assert(#bits == 6)
+  return bits[1]
+    .. (horiz1 and box.horiz:rep(col_widths.first + 2) or (" "):rep(col_widths.first + 2))
+    .. bits[2]
+    .. (horiz2 and box.horiz:rep(col_widths.behind) or " Behind ")
+    .. bits[3]
+    .. (horiz2 and box.horiz:rep(col_widths.ahead) or " Ahead ")
+    .. bits[4]
+    .. (horiz2 and box.horiz:rep(col_widths.behind) or " Behind ")
+    .. bits[5]
+    .. (horiz2 and box.horiz:rep(col_widths.ahead) or " Ahead ")
+    .. bits[6]
+end
 
 local function behind_colour(n)
   if not n then
     return lib.colours.bold
+  elseif n == 0 then
+    return lib.colours.cyan
   else
-    return n == 0 and lib.colours.cyan or lib.colours.yellow
+    return lib.colours.yellow
   end
 end
 
 local function ahead_colour(n)
   if not n then
     return lib.colours.bold
+  elseif n == 0 then
+    return lib.colours.cyan
   else
-    return n == 0 and lib.colours.cyan or lib.colours.green
+    return lib.colours.green
   end
 end
 
--- loop over branches
-for _, branch in ipairs(branches) do
-  local behind_remote = branch.behind_remote and tostring(branch.behind_remote) or "n/a"
-  local ahead_remote = branch.ahead_remote and tostring(branch.ahead_remote) or "n/a"
-  print(
-    box.verti
-      .. " "
-      .. branch.name:pad_right(col_name_length + 1):add_colour()
-      .. box.verti
-      .. tostring(branch.behind):pad_left(#" Behind"):add_colour(behind_colour(branch.behind))
-      .. " "
-      .. box.verti
-      .. tostring(branch.ahead):pad_left(#" Ahead"):add_colour(ahead_colour(branch.ahead))
-      .. " "
-      .. box.verti
-      .. behind_remote:pad_left(#" Behind"):add_colour(behind_colour(branch.behind_remote))
-      .. " "
-      .. box.verti
-      .. ahead_remote:pad_left(#" Ahead"):add_colour(ahead_colour(branch.ahead_remote))
-      .. " "
-      .. box.verti
-  )
+local function branch_row(branch, behind_remote, ahead_remote)
+  return box.verti
+    .. " "
+    .. branch.name:pad_right(col_widths.first + 1):add_colour()
+    .. box.verti
+    .. tostring(branch.behind):pad_left(col_widths.behind - 1):add_colour(behind_colour(branch.behind))
+    .. " "
+    .. box.verti
+    .. tostring(branch.ahead):pad_left(col_widths.ahead - 1):add_colour(ahead_colour(branch.ahead))
+    .. " "
+    .. box.verti
+    .. behind_remote:pad_left(col_widths.behind - 1):add_colour(behind_colour(branch.behind_remote))
+    .. " "
+    .. box.verti
+    .. ahead_remote:pad_left(col_widths.ahead - 1):add_colour(ahead_colour(branch.ahead_remote))
+    .. " "
+    .. box.verti
 end
 
--- table footer
-print(
-  box.bot_l
-    .. box.horiz:rep(col_name_length + 2)
-    .. box.bot_t
-    .. box.horiz:rep(#" Behind ")
-    .. box.bot_t
-    .. box.horiz:rep(#" Ahead ")
-    .. box.bot_t
-    .. box.horiz:rep(#" Behind ")
-    .. box.bot_t
-    .. box.horiz:rep(#" Ahead ")
-    .. box.bot_r
-)
+local function print_table()
+  print(top_border_row())
+  print(header_row())
+  print(horiz_div_row({ box.verti, box.jun_l, box.top_t, box.cross, box.top_t, box.jun_r }, false, true))
+  print(horiz_div_row({ box.verti, box.verti, box.verti, box.verti, box.verti, box.verti }, false, false))
+  print(horiz_div_row({ box.jun_l, box.cross, box.cross, box.cross, box.cross, box.jun_r }, true, true))
+  for _, branch in ipairs(branches) do
+    local behind_remote = branch.behind_remote and tostring(branch.behind_remote) or "n/a"
+    local ahead_remote = branch.ahead_remote and tostring(branch.ahead_remote) or "n/a"
+    print(branch_row(branch, behind_remote, ahead_remote))
+  end
+  print(horiz_div_row({ box.bot_l, box.bot_t, box.bot_t, box.bot_t, box.bot_t, box.bot_r }, true, true))
+end
+
+print_table()
