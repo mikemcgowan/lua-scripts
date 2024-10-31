@@ -42,7 +42,7 @@ local branches = lib.map(branch_names, function(branch_name)
   local remote_branch =
     lib.capture_output("git branch -r --format='%(refname:short)' | grep -Po 'origin/" .. branch_name .. "' | uniq")
   if remote_branch and #remote_branch > 0 then
-    behind, ahead = behind_and_ahead(branch_name, "origin/" .. branch_name)
+    behind, ahead = behind_and_ahead("origin/" .. branch_name, branch_name)
     t.behind_remote = behind
     t.ahead_remote = ahead
   end
