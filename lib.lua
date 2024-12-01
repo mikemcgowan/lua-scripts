@@ -22,46 +22,47 @@ local table_chars = {
   cross = "┼",
 }
 
-function string.add_colour(text, colour)
-  local s = colours.bold
+function string.add_colour(s, colour)
+  local t = colours.bold
   if colour then
-    s = s .. colour
+    t = t .. colour
   end
-  s = s .. text .. colours.reset
-  return s
+  t = t .. s .. colours.reset
+  return t
 end
 
-function string.visible_length(text)
+function string.visible_length(s)
   local ansi_pattern = "\27%[%d+m"
-  local stripped = text:gsub(ansi_pattern, "")
+  local stripped = s:gsub(ansi_pattern, "")
   return #stripped
 end
 
-function string.split(text, expr)
-  local lines = {}
-  for line in text:gmatch(expr) do
-    table.insert(lines, line)
+function string.split(s, expr)
+  expr = expr or "%S+"
+  local t = {}
+  for line in s:gmatch(expr) do
+    table.insert(t, line)
   end
-  return lines
+  return t
 end
 
-function string.to_lines(text)
-  return text:split("[^\r\n]+")
+function string.to_lines(s)
+  return s:split("[^\r\n]+")
 end
 
-function string.pad_left(text, size)
-  if text:visible_length() >= size then
-    return text
+function string.pad_left(s, size)
+  if s:visible_length() >= size then
+    return s
   else
-    return (" "):rep(size - text:visible_length()) .. text
+    return (" "):rep(size - s:visible_length()) .. s
   end
 end
 
-function string.pad_right(text, size)
-  if text:visible_length() >= size then
-    return text
+function string.pad_right(s, size)
+  if s:visible_length() >= size then
+    return s
   else
-    return text .. (" "):rep(size - text:visible_length())
+    return s .. (" "):rep(size - s:visible_length())
   end
 end
 
