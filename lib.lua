@@ -66,6 +66,18 @@ function string.pad_right(s, size)
   end
 end
 
+function table.to_set(t)
+  local u = {}
+  local seen = {}
+  for _, v in ipairs(t) do
+    if not seen[v] then
+      table.insert(u, v)
+      seen[v] = true
+    end
+  end
+  return u
+end
+
 local function capture_output(cmd, mode)
   mode = mode or "*line"
   local f = assert(io.popen(cmd, "r"))

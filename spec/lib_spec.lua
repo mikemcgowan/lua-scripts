@@ -62,6 +62,33 @@ describe("string.pad_right", function()
   end)
 end)
 
+describe("table.to_set", function()
+  it("removes duplicates from an array resulting in a set", function()
+    local t = { 1, 1, 2, 3, 3, 3 }
+    assert.are.same({ 1, 2, 3 }, table.to_set(t))
+  end)
+
+  it("keeps an array that's already a set unchanged", function()
+    local t = { 1, 2, 3 }
+    assert.are.same({ 1, 2, 3 }, table.to_set(t))
+  end)
+
+  it("works for strings", function()
+    local t = { "apple", "apple", "orange", "banana", "orange", "orange", "apple" }
+    assert.are.same({ "apple", "orange", "banana" }, table.to_set(t))
+  end)
+
+  it("converts an empty array to an empty set", function()
+    assert.are.same({}, table.to_set({}))
+  end)
+
+  it("doesn't mutate the original array", function()
+    local original = { 1, 2, 2, 2, 3 }
+    table.to_set(original)
+    assert.are.same({ 1, 2, 2, 2, 3 }, original)
+  end)
+end)
+
 describe("capture_output", function()
   it("captures the output of an echo", function()
     assert.are.same(hello, lib.capture_output("echo " .. hello))
