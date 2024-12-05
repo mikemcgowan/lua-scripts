@@ -40,8 +40,8 @@ end
 function string.split(s, expr)
   expr = expr or "%S+"
   local t = {}
-  for line in s:gmatch(expr) do
-    table.insert(t, line)
+  for match in s:gmatch(expr) do
+    table.insert(t, match)
   end
   return t
 end
@@ -141,6 +141,30 @@ local function max_by(t, f)
   return max
 end
 
+local function all(t, f)
+  for _, v in ipairs(t) do
+    if not f(v) then
+      return false
+    end
+  end
+  return true
+end
+
+local function any(t, f)
+  for _, v in ipairs(t) do
+    if f(v) then
+      return true
+    end
+  end
+  return false
+end
+
+local function in_array(t, v)
+  return any(t, function(x)
+    return v == x
+  end)
+end
+
 return {
   colours = colours,
   table_chars = table_chars,
@@ -150,4 +174,7 @@ return {
   map = map,
   filter = filter,
   max_by = max_by,
+  all = all,
+  any = any,
+  in_array = in_array,
 }
