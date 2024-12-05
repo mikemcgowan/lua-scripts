@@ -176,4 +176,63 @@ describe("max_by", function()
       end)
     )
   end)
+
+  describe("any", function()
+    local t = { "one", "two", "three", "four" }
+
+    it("returns true if there's at least one match", function()
+      assert.are.same(
+        true,
+        lib.any(t, function(x)
+          return x and #x > 0 and x:sub(1, 1) == "t"
+        end)
+      )
+    end)
+
+    it("returns false if there's no match", function()
+      assert.are.same(
+        false,
+        lib.any(t, function(x)
+          return x and #x > 0 and x == "five"
+        end)
+      )
+    end)
+  end)
+
+  describe("all", function()
+    local t = { "one", "two", "three", "four" }
+
+    it("returns true if all match", function()
+      assert.are.same(
+        true,
+        lib.all(t, function(x)
+          return x and #x > 2
+        end)
+      )
+    end)
+
+    it("returns false if at least one doesn't match", function()
+      assert.are.same(
+        false,
+        lib.all(t, function(x)
+          return x and #x < 4
+        end)
+      )
+    end)
+  end)
+
+  describe("in_array", function()
+    local t = { 1, 2, 3, 4, 5 }
+
+    it("returns true if an element is in an array", function()
+      for _, v in ipairs(t) do
+        assert.are.same(true, lib.in_array(t, v))
+      end
+    end)
+
+    it("returns false if an element is not in an array", function()
+      assert.are.same(false, lib.in_array(t, 0))
+      assert.are.same(false, lib.in_array(t, 6))
+    end)
+  end)
 end)
