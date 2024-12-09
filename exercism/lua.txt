@@ -112,3 +112,4 @@ killer-sudoku-helper
 palindrome-products
 state-of-tic-tac-toe
 dominoes
+complex-numbers
