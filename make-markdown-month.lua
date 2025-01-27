@@ -21,7 +21,7 @@ local function day_of_week_text(day_of_week)
   elseif day_of_week == 1 then
     return "Sun"
   end
-  return "   "
+  return "✓✗"
 end
 
 if not arg[1] then
@@ -40,12 +40,12 @@ if not arg[1] or not arg[2] then
 end
 
 print("| Day | Alcohol | Coffee |")
-print("| --- | ------- | ------ |")
+print("|----:|--------:|-------:|")
 
 local days_in_month = get_days_in_month(arg[1], arg[2])
 local day_of_week = get_first_day_of_week(arg[1], arg[2])
 for day_in_month = 1, days_in_month do
-  print("|  " .. string.format("%2d", day_in_month) .. " | " .. day_of_week_text(day_of_week) .. "     |        |")
+  print("| " .. day_in_month .. " | " .. day_of_week_text(day_of_week) .. " | ✓✗ |")
   day_of_week = day_of_week + 1
   if day_of_week > 7 then
     day_of_week = 1
