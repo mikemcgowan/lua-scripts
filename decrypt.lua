@@ -1,10 +1,18 @@
 local lib = require("lib")
+local lfs = require("lfs")
 
-local input = arg[1]
+local input = arg[2]
 if not input then
   print(("Missing arg 1/1: input file to decrypt"):add_colour(lib.colours.yellow))
   os.exit(1)
 end
+
+input = arg[1] .. "/" .. input
+if not lfs.attributes(input) then
+  print(("Input file '" .. input .. "' is missing!"):add_colour(lib.colours.yellow))
+  os.exit(1)
+end
+
 if input:sub(#input - 3, #input) ~= ".gpg" then
   print(("Can only decrypt a .gpg file"):add_colour(lib.colours.yellow))
   os.exit(1)
