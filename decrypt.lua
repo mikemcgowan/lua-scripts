@@ -20,4 +20,7 @@ end
 
 local input_without_dot_gpg = input:sub(1, #input - 4)
 os.execute("gpg --decrypt " .. input .. " > " .. input_without_dot_gpg)
+if lfs.attributes(input_without_dot_gpg) then
+  os.execute("chmod 600 " .. input_without_dot_gpg)
+end
 os.execute("gpg-connect-agent reloadagent /bye")
