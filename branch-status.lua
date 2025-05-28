@@ -8,15 +8,23 @@ if not dir then
 end
 lfs.chdir(dir)
 
-local base = arg[2]
-if not base then
-  print(("Missing arg 2/2: base branch - defaulting to 'master'"):add_colour(lib.colours.cyan))
-  base = "master"
+local base_arg = arg[2]
+local bases = { base_arg }
+if not base_arg then
+  print(("Missing arg 2/2: base branch - defaulting to 'master' and 'main'"):add_colour(lib.colours.cyan))
+  bases = { "master", "main" }
 end
 
-local base_exists = lib.capture_output("git branch -a --format='%(refname:short)' | grep -P '^" .. base .. "$'")
-if not base_exists or #base_exists == 0 or base_exists ~= base then
-  print(("Can't find base branch '" .. base .. "'"):add_colour(lib.colours.yellow))
+local base
+for _, b in ipairs(bases) do
+  local base_exists = lib.capture_output("git branch -a --format='%(refname:short)' | grep -P '^" .. b .. "$'")
+  if base_exists and #base_exists > 0 and base_exists == b then
+    base = b
+    break
+  end
+end
+if not base then
+  print(("Can't find base branch"):add_colour(lib.colours.yellow))
   os.exit(1)
 end
 print(("Branch status relative to base branch '" .. base .. "'"):add_colour(lib.colours.cyan))
