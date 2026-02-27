@@ -12,7 +12,7 @@ for _, dotfile in ipairs(lib.files_in_path(dotfiles_dir)) do
   print(dotfile:add_colour())
   local root = home_dir .. "/." .. dotfile
   if lfs.attributes(root) ~= nil then
-    os.execute("git diff ~/." .. dotfile .. " " .. dotfiles_dir .. "/" .. dotfile)
+    os.execute("colordiff -u ~/." .. dotfile .. " " .. dotfiles_dir .. "/" .. dotfile)
   else
     print(("Dotfile '" .. root .. "' is missing!"):add_colour(lib.colours.yellow))
   end
